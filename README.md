@@ -8,8 +8,7 @@ This document outlines the system design and data architecture for a real-time c
 
 - [Architecture Diagram](./docs/ARCHITECTURE_DIAGRAM.md)
 - [Data Structure](./docs/DATA_STRUCTURE.md)
-- [Storage Strategy](./docs/STORAGE_STRATEGY.md)
-- [Security Rules](./docs/SECURITY_RULES.md)
+- [Storage Structure](./docs/STORAGE_STRUCTURE.md)
 
 ## Quick Start
 

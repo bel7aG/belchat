@@ -8,7 +8,7 @@ Firebase Storage is organized in a hierarchical structure that mirrors Firestore
 
 ## Folder Structure
 
-\`\`\`
+```
 /users/
   /{userId}/
     /avatar.jpg                     # User profile picture
@@ -25,7 +25,7 @@ Firebase Storage is organized in a hierarchical structure that mirrors Firestore
           /small/{filename}         # Small thumbnail (150px)
           /medium/{filename}        # Medium thumbnail (300px)
           /large/{filename}         # Large thumbnail (600px)
-\`\`\`
+```
 
 ### Structure Rationale
 
@@ -47,21 +47,21 @@ Firebase Storage is organized in a hierarchical structure that mirrors Firestore
 
 #### User Avatars
 
-\`\`\`
+```
 /users/{userId}/avatar.jpg
-\`\`\`
+```
 
 - Fixed filename allows easy updates while maintaining the same reference
 - Previous versions can be archived with timestamps if needed:
-  \`\`\`
+  ```
   /users/{userId}/avatar_archives/avatar_20230615.jpg
-  \`\`\`
+  ```
 
 #### Message Attachments
 
-\`\`\`
+```
 /conversations/{conversationId}/messages/{messageId}/original/{sanitized-filename}
-\`\`\`
+```
 
 Where `{sanitized-filename}` follows these rules:
 - Original filename is sanitized (remove spaces, special characters)
@@ -70,22 +70,22 @@ Where `{sanitized-filename}` follows these rules:
 - For duplicate filenames, a counter is appended: `{timestamp}-{sanitized-filename}-{counter}.{ext}`
 
 Example:
-\`\`\`
+```
 /conversations/conv123/messages/msg456/original/1621234567-project-proposal.pdf
-\`\`\`
+```
 
 #### Thumbnails
 
-\`\`\`
+```
 /conversations/{conversationId}/messages/{messageId}/thumbnails/{size}/{filename}
-\`\`\`
+```
 
 Where:
 - `{size}` is one of: `small`, `medium`, or `large`
 - `{filename}` is the same as the original file, with possible format conversion:
-  \`\`\`
+  ```
   1621234567-project-image.jpg
-  \`\`\`
+  ```
 
 ## Firestore References to Storage Files
 
@@ -93,7 +93,7 @@ Where:
 
 In Firestore documents, files are referenced using the following structure:
 
-\`\`\`typescript
+```typescript
 fileData: {
   url: string            // Full download URL for the file
   path: string           // Storage path for access control
@@ -106,11 +106,11 @@ fileData: {
   height?: number        // Image height (if applicable)
   createdAt: Timestamp   // When the file was uploaded
 }
-\`\`\`
+```
 
 ### Example Firestore Document with File Reference
 
-\`\`\`json
+```json
 {
   "id": "msg456",
   "senderId": "user123",
@@ -133,11 +133,11 @@ fileData: {
   },
   "readBy": ["user123"]
 }
-\`\`\`
+```
 
 ### Image with Thumbnails Example
 
-\`\`\`json
+```json
 {
   "id": "msg789",
   "senderId": "user456",
@@ -164,7 +164,7 @@ fileData: {
   },
   "readBy": ["user456"]
 }
-\`\`\`
+```
 
 ## Versioning and Deduplication Strategies
 
@@ -173,17 +173,17 @@ fileData: {
 For files that may be updated (like user avatars or shared documents), we implement the following versioning strategy:
 
 1. **Fixed-name current version**: The current version always has a fixed path
-   \`\`\`
+   ```
    /users/{userId}/avatar.jpg
-   \`\`\`
+   ```
 
 2. **Archived versions**: Previous versions are moved to an archives folder with timestamps
-   \`\`\`
+   ```
    /users/{userId}/avatar_archives/avatar_20230615.jpg
-   \`\`\`
+   ```
 
 3. **Version tracking in Firestore**: For document files that need version history, we track versions in Firestore
-   \`\`\`typescript
+   ```typescript
    fileVersions: [
      {
        version: 1,
@@ -194,7 +194,7 @@ For files that may be updated (like user avatars or shared documents), we implem
      },
      // More versions...
    ]
-   \`\`\`
+   ```
 
 ## Security Considerations
 
@@ -202,9 +202,9 @@ For files that may be updated (like user avatars or shared documents), we implem
 
 Firebase Storage security rules are configured to ensure that only authorized users can access files, for example:
 
-\`\`\`
+```
 allow read, write: if request.auth.uid == userId;
-\`\`\`
+```
 
 ## Performance Optimization
 
@@ -228,7 +228,7 @@ To prevent storage leaks, implement a cleanup strategy for orphaned files:
 3. **Soft delete**: Implement a soft delete strategy with a grace period before permanent deletion
 
 ### Example
-\`\`\`typescript
+```typescript
 // Cloud Function to delete files when a message is deleted
 exports.cleanupMessageFiles = functions.firestore
   .document('conversations/{conversationId}/messages/{messageId}')
@@ -241,6 +241,6 @@ exports.cleanupMessageFiles = functions.firestore
       // Delete thumbnails if they exist
     }
   });
-\`\`\`
+```
 
 This storage structure provides a robust foundation for managing files in the BelChat application, with clear organization, efficient naming strategies, and proper references between Firestore documents and Storage files.

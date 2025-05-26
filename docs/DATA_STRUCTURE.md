@@ -13,7 +13,7 @@ The database consists of three main components:
 
 ### Schema
 
-\`\`\`typescript
+```typescript
 // Collection: users/{userId}
 {
   id: string                    // Same as document ID
@@ -34,7 +34,7 @@ The database consists of three main components:
     soundEffects: boolean
   }
 }
-\`\`\`
+```
 
 ### Indexing Considerations
 
@@ -44,7 +44,7 @@ The database consists of three main components:
 
 ### Example Document
 
-\`\`\`json
+```json
 {
   "id": "user123",
   "username": "johndoe",
@@ -67,12 +67,12 @@ The database consists of three main components:
     "soundEffects": true
   }
 }
-\`\`\`
+```
 
 
 ### Schema
 
-\`\`\`typescript
+```typescript
 // Collection: conversations/{conversationId}
 {
   id: string                    // Same as document ID
@@ -89,7 +89,7 @@ The database consists of three main components:
   
   // messages: Message[]        // MOVED to subcollection: conversations/{conversationId}/messages/{messageId}
 }
-\`\`\`
+```
 
 ### Indexing Considerations
 
@@ -99,7 +99,7 @@ The database consists of three main components:
 
 ### Example Document
 
-\`\`\`json
+```json
 {
   "id": "conv123",
   "type": "group",
@@ -122,7 +122,7 @@ The database consists of three main components:
     "_nanoseconds": 0
   }
 }
-\`\`\`
+```
 
 ## Messages Subcollection
 
@@ -130,7 +130,7 @@ Messages are stored as a subcollection under each conversation document.
 
 ### Schema
 
-\`\`\`typescript
+```typescript
 // Subcollection: conversations/{conversationId}/messages/{messageId}
 {
   id: string                    // Same as document ID
@@ -160,7 +160,7 @@ Messages are stored as a subcollection under each conversation document.
   isEdited?: boolean            // Whether message has been edited
   isDeleted?: boolean           // Soft delete flag
 }
-\`\`\`
+```
 
 ### Message Types Representation
 1. **Text Message**: 
@@ -199,7 +199,7 @@ Key metadata:
 
 #### Text Message
 
-\`\`\`json
+```json
 {
   "id": "msg123",
   "senderId": "user123",
@@ -225,11 +225,11 @@ Key metadata:
     }
   ]
 }
-\`\`\`
+```
 
 #### File/Image Message
 
-\`\`\`json
+```json
 {
   "id": "msg456",
   "senderId": "user456",
@@ -251,11 +251,11 @@ Key metadata:
   },
   "readBy": ["user456"]
 }
-\`\`\`
+```
 
 #### Mixed Message (Text + File)
 
-\`\`\`json
+```json
 {
   "id": "msg789",
   "senderId": "user789",
@@ -280,58 +280,58 @@ Key metadata:
     "_nanoseconds": 0
   }
 }
-\`\`\`
+```
 
 ## Query Patterns
 
 ### Common Queries and Their Implementation
 
 1. **Get User's Conversations**:
-   \`\`\`javascript
+   ```javascript
    const conversationsRef = collection(db, 'conversations');
    const q = query(
      conversationsRef,
      where('participants', 'array-contains', userId),
      orderBy('updatedAt', 'desc')
    );
-   \`\`\`
+   ```
 
 2. **Get Recent Messages in a Conversation**:
-   \`\`\`javascript
+   ```javascript
    const messagesRef = collection(db, 'conversations', conversationId, 'messages');
    const q = query(
      messagesRef,
      orderBy('timestamp', 'desc'),
      limit(50)
    );
-   \`\`\`
+   ```
 
 3. **Get Media Messages Only**:
-   \`\`\`javascript
+   ```javascript
    const messagesRef = collection(db, 'conversations', conversationId, 'messages');
    const q = query(
      messagesRef,
      where('type', 'in', ['file', 'mixed']),
      orderBy('timestamp', 'desc')
    );
-   \`\`\`
+   ```
 
 4. **Get Unread Messages**:
-   \`\`\`javascript
+   ```javascript
    const messagesRef = collection(db, 'conversations', conversationId, 'messages');
    const q = query(
      messagesRef,
      where('readBy', 'array-contains', userId),
      orderBy('timestamp', 'desc')
    );
-   \`\`\`
+   ```
 
 
 ## Security Rules
 
 Example Firestore security rules to protect this data structure:
 
-\`\`\`
+```
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
@@ -354,4 +354,4 @@ service cloud.firestore {
     }
   }
 }
-\`\`\`
+```
