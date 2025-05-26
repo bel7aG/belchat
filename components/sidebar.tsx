@@ -1,21 +1,20 @@
 'use client'
 
-import { useMemo, useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useState } from 'react'
+import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Search, UsersIcon, PanelLeftClose, PanelLeft, Users } from 'lucide-react'
+import { Search, Users, PanelLeftClose, PanelLeft } from 'lucide-react'
 
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
-import { StatusIndicator } from '@/components/status-indicator'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import useFirstRender from '@/hooks/use-first-render'
+import { StatusIndicator } from '@/components/status-indicator'
 import type { Conversation } from '@/lib/mock-data'
-import { useChatStore } from '@/stores/chat-store'
+import { getUserStatus } from '@/lib/user-utils'
 import { cn } from '@/lib/utils'
 import { useUserStore } from '@/stores/user-store'
-import { getUserStatus } from '@/lib/user-utils'
+import { useChatStore } from '@/stores/chat-store'
 
 interface SidebarProps {
   selectedConversation: Conversation
@@ -25,11 +24,7 @@ interface SidebarProps {
 
 export function Sidebar({ selectedConversation, isOpen, onToggle }: SidebarProps) {
   const [searchQuery, setSearchQuery] = useState('')
-
   const [activeTab, setActiveTab] = useState('all')
-  const router = useRouter()
-
-  const isFirstRender = useFirstRender()
 
   // Get conversations from the store
   const conversations = useChatStore((state) => state.conversations)
@@ -38,40 +33,42 @@ export function Sidebar({ selectedConversation, isOpen, onToggle }: SidebarProps
     conversation.name.toLowerCase().includes(searchQuery.toLowerCase()),
   )
 
-  const handleSelectConversation = (conversation: Conversation) => {
-    router.push(`/chat/${conversation.id}`)
-  }
-
   const handleTabChange = (value: string) => {
     setActiveTab(value)
   }
 
-  const tabsFramerConfig = useMemo(() => {
-    const initial = isFirstRender ? { opacity: 1, y: 0 } : { opacity: 0, y: 10 }
-
-    return {
-      sidebar: {
-        width: isOpen ? 320 : 0,
-        opacity: isOpen ? 1 : 0,
-      },
-      tabs: {
-        initial,
-        animate: { opacity: 1, y: 0 },
-        exit: { opacity: 0, y: -10 },
-        transition: { duration: 0.2 },
-      },
+  const getFilteredConversations = (conversations: Conversation[], tab: string) => {
+    switch (tab) {
+      case 'direct':
+        return conversations.filter((c) => c.type === 'direct')
+      case 'groups':
+        return conversations.filter((c) => c.type === 'group')
+      default:
+        return conversations
     }
-  }, [isFirstRender, isOpen])
+  }
+
+  const tabsFramerConfig = {
+    tabs: {
+      initial: { opacity: 0, y: 10 },
+      animate: { opacity: 1, y: 0 },
+      exit: { opacity: 0, y: -10 },
+      transition: { duration: 0.2 },
+    },
+  }
 
   return (
     <>
       <motion.div
         initial={false}
-        animate={tabsFramerConfig.sidebar}
+        animate={{
+          width: isOpen ? 320 : 0,
+          opacity: isOpen ? 1 : 0,
+        }}
         transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-        className="fixed left-0 top-0 z-50 h-screen w-screen flex-shrink-0 overflow-hidden md:relative md:h-full"
+        className="relative flex-shrink-0 overflow-hidden"
       >
-        <div className="flex h-full w-full flex-col rounded-none bg-card shadow-lg backdrop-blur-md md:rounded-2xl">
+        <div className="flex h-full w-[320px] flex-col rounded-2xl bg-gray-50/80 shadow-lg backdrop-blur-md dark:bg-black/40">
           {/* Header */}
           <div className="flex flex-shrink-0 items-center justify-between p-4">
             <h2 className="text-lg font-semibold text-gray-800 dark:text-white">Messages</h2>
@@ -118,60 +115,19 @@ export function Sidebar({ selectedConversation, isOpen, onToggle }: SidebarProps
 
               <div className="relative flex-1 overflow-hidden">
                 <AnimatePresence mode="wait">
-                  {activeTab === 'all' && (
-                    <motion.div {...tabsFramerConfig.tabs} key="all" className="absolute inset-0 flex flex-col">
-                      <div className="flex-1 overflow-y-auto overflow-x-hidden">
-                        <div className="flex flex-col px-4 pb-2">
-                          {filteredConversations.map((conversation) => (
-                            <ConversationItem
-                              key={conversation.id}
-                              conversation={conversation}
-                              isSelected={selectedConversation.id === conversation.id}
-                              onClick={() => handleSelectConversation(conversation)}
-                            />
-                          ))}
-                        </div>
+                  <motion.div {...tabsFramerConfig.tabs} key={activeTab} className="absolute inset-0 flex flex-col">
+                    <div className="flex-1 overflow-y-auto overflow-x-hidden">
+                      <div className="flex flex-col px-4 pb-2">
+                        {getFilteredConversations(filteredConversations, activeTab).map((conversation) => (
+                          <ConversationItem
+                            key={conversation.id}
+                            conversation={conversation}
+                            isSelected={selectedConversation.id === conversation.id}
+                          />
+                        ))}
                       </div>
-                    </motion.div>
-                  )}
-
-                  {activeTab === 'direct' && (
-                    <motion.div {...tabsFramerConfig.tabs} key="direct" className="absolute inset-0 flex flex-col">
-                      <div className="flex-1 overflow-y-auto overflow-x-hidden">
-                        <div className="flex flex-col px-4 pb-2">
-                          {filteredConversations
-                            .filter((c) => c.type === 'direct')
-                            .map((conversation) => (
-                              <ConversationItem
-                                key={conversation.id}
-                                conversation={conversation}
-                                isSelected={selectedConversation.id === conversation.id}
-                                onClick={() => handleSelectConversation(conversation)}
-                              />
-                            ))}
-                        </div>
-                      </div>
-                    </motion.div>
-                  )}
-
-                  {activeTab === 'groups' && (
-                    <motion.div {...tabsFramerConfig.tabs} key="groups" className="absolute inset-0 flex flex-col">
-                      <div className="flex-1 overflow-y-auto overflow-x-hidden">
-                        <div className="flex flex-col px-4 pb-2">
-                          {filteredConversations
-                            .filter((c) => c.type === 'group')
-                            .map((conversation) => (
-                              <ConversationItem
-                                key={conversation.id}
-                                conversation={conversation}
-                                isSelected={selectedConversation.id === conversation.id}
-                                onClick={() => handleSelectConversation(conversation)}
-                              />
-                            ))}
-                        </div>
-                      </div>
-                    </motion.div>
-                  )}
+                    </div>
+                  </motion.div>
                 </AnimatePresence>
               </div>
             </Tabs>
@@ -183,14 +139,14 @@ export function Sidebar({ selectedConversation, isOpen, onToggle }: SidebarProps
       <AnimatePresence>
         {!isOpen && (
           <motion.button
-            initial={{ scale: 0, x: -40, opacity: 0 }}
-            animate={{ scale: 1, x: 0, opacity: 1 }}
-            exit={{ scale: 0, x: -40, opacity: 0 }}
+            initial={{ scale: 0, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0, opacity: 0 }}
             transition={{ type: 'spring', damping: 20, stiffness: 300 }}
             onClick={onToggle}
-            className="fixed left-2 top-8 z-30 rounded-full p-2 transition-colors hover:bg-gray-100/10 dark:hover:bg-white/10"
+            className="fixed left-2 top-4 z-30 rounded-full p-2 transition-colors hover:bg-gray-100/10 dark:hover:bg-white/10"
           >
-            <PanelLeft className="h-5 w-5 text-gray-800 dark:text-white" />
+            <PanelLeft className="h-4 w-4 text-gray-800 dark:text-white" />
           </motion.button>
         )}
       </AnimatePresence>
@@ -198,15 +154,9 @@ export function Sidebar({ selectedConversation, isOpen, onToggle }: SidebarProps
   )
 }
 
-interface ConversationItemProps {
-  conversation: Conversation
-  isSelected: boolean
-  onClick: () => void
-}
-
-function ConversationItem({ conversation, isSelected, onClick }: ConversationItemProps) {
+function ConversationItem({ conversation, isSelected }: { conversation: Conversation; isSelected: boolean }) {
   // Get user store functions without creating a subscription
-  const getUserById = useUserStore((state) => state.getUserById)
+  const { getUserById } = useUserStore.getState()
 
   // For direct conversations, get the other user's data
   const otherUserId =
@@ -223,8 +173,9 @@ function ConversationItem({ conversation, isSelected, onClick }: ConversationIte
       : statusText
 
   return (
-    <button
-      onClick={onClick}
+    <Link
+      prefetch
+      href={`/chat/${conversation.id}`}
       className={cn(
         'mb-2 flex w-full items-center gap-3 rounded-xl p-3 text-left transition-colors',
         isSelected
@@ -235,7 +186,7 @@ function ConversationItem({ conversation, isSelected, onClick }: ConversationIte
       {conversation.type === 'direct' ? (
         <div className="relative">
           <Avatar className="h-10 w-10 flex-shrink-0">
-            <AvatarImage src={conversation.avatar || '/mock-image.svg'} alt={conversation.name} />
+            <AvatarImage src={conversation.avatar || '/placeholder.svg'} alt={conversation.name} />
             <AvatarFallback>{conversation.name.charAt(0)}</AvatarFallback>
           </Avatar>
           <StatusIndicator status={otherUser?.status} />
@@ -261,7 +212,7 @@ function ConversationItem({ conversation, isSelected, onClick }: ConversationIte
           {conversation.unreadCount}
         </div>
       )}
-    </button>
+    </Link>
   )
 }
 

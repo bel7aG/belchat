@@ -17,7 +17,7 @@ export function MessageListSkeleton() {
   ]
 
   return (
-    <div className="flex-1 overflow-y-auto overflow-x-hidden p-4 duration-500 animate-in">
+    <div className="flex-1 overflow-x-hidden overflow-y-hidden p-4 duration-500 animate-in">
       <div className="w-full space-y-4">
         {messages.map((message, index) => (
           <div key={index} className="flex gap-3">

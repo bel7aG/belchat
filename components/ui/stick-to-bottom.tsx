@@ -1,8 +1,9 @@
 'use client'
 
-import { cn } from '@/lib/utils'
 import type React from 'react'
 import { useEffect, useRef, useState, useCallback } from 'react'
+
+import { cn } from '@/lib/utils'
 
 // Custom hook to handle the sticky bottom behavior
 export function useStickToBottom(options?: {
@@ -177,33 +178,8 @@ export function StickToBottom({
   }
 
   return (
-    <>
-      <div ref={containerRef} className={cn('overflow-y-auto overscroll-none', className)} style={containerStyle}>
-        {children}
-      </div>
-      {!isSticky && !isChangingConversation && (
-        <div className="absolute bottom-4 left-1/2 z-10 -translate-x-1/2 transform duration-300 animate-in fade-in">
-          <button
-            onClick={() => scrollToBottom(true)}
-            className="flex h-10 w-10 animate-bounce items-center justify-center rounded-full bg-black/80 text-white shadow-lg hover:bg-black"
-            aria-label="Scroll to bottom"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <polyline points="6 9 12 15 18 9"></polyline>
-            </svg>
-          </button>
-        </div>
-      )}
-    </>
+    <div ref={containerRef} className={cn('overflow-y-auto overscroll-none', className)} style={containerStyle}>
+      {children}
+    </div>
   )
 }
