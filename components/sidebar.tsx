@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Search, Users, PanelLeftClose, PanelLeft } from 'lucide-react'
@@ -15,6 +15,7 @@ import { getUserStatus } from '@/lib/user-utils'
 import { cn } from '@/lib/utils'
 import { useUserStore } from '@/stores/user-store'
 import { useChatStore } from '@/stores/chat-store'
+import useFirstRender from '@/hooks/use-first-render'
 
 interface SidebarProps {
   selectedConversation: Conversation
@@ -25,6 +26,8 @@ interface SidebarProps {
 export function Sidebar({ selectedConversation, isOpen, onToggle }: SidebarProps) {
   const [searchQuery, setSearchQuery] = useState('')
   const [activeTab, setActiveTab] = useState('all')
+
+  const isFirstRender = useFirstRender()
 
   // Get conversations from the store
   const conversations = useChatStore((state) => state.conversations)
@@ -48,27 +51,32 @@ export function Sidebar({ selectedConversation, isOpen, onToggle }: SidebarProps
     }
   }
 
-  const tabsFramerConfig = {
-    tabs: {
-      initial: { opacity: 0, y: 10 },
-      animate: { opacity: 1, y: 0 },
-      exit: { opacity: 0, y: -10 },
-      transition: { duration: 0.2 },
-    },
-  }
+  const tabsFramerConfig = useMemo(() => {
+    const initial = isFirstRender ? { opacity: 1, y: 0 } : { opacity: 0, y: 10 }
+
+    return {
+      sidebar: {
+        width: isOpen ? 320 : 0,
+        opacity: isOpen ? 1 : 0,
+      },
+      tabs: {
+        initial,
+        animate: { opacity: 1, y: 0 },
+        exit: { opacity: 0, y: -10 },
+        transition: { duration: 0.2 },
+      },
+    }
+  }, [isFirstRender, isOpen])
 
   return (
     <>
       <motion.div
         initial={false}
-        animate={{
-          width: isOpen ? 320 : 0,
-          opacity: isOpen ? 1 : 0,
-        }}
+        animate={tabsFramerConfig.sidebar}
         transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-        className="relative flex-shrink-0 overflow-hidden"
+        className="fixed left-0 top-0 z-50 h-screen w-screen flex-shrink-0 overflow-hidden border-r shadow md:relative md:h-full md:border-none md:shadow-none"
       >
-        <div className="flex h-full w-[320px] flex-col rounded-2xl bg-gray-50/80 shadow-lg backdrop-blur-md dark:bg-black/40">
+        <div className="flex h-full w-full flex-col rounded-none bg-card shadow-lg backdrop-blur-md md:rounded-2xl">
           {/* Header */}
           <div className="flex flex-shrink-0 items-center justify-between p-4">
             <h2 className="text-lg font-semibold text-gray-800 dark:text-white">Messages</h2>
