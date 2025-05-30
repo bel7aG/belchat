@@ -33,7 +33,7 @@ This chat application uses:
 
 The application will follow a serverless architecture pattern with Firebase as the backend in the future. The frontend is built with Next.js 15 App Router, leveraging server components for improved performance using client components and Framer motion for interactive elements.
 
-For detailed architecture information, see [ARCHITECTURE_DIAGRAM.md](ARCHITECTURE_DIAGRAM.md).
+For detailed architecture information, see [Architecture Diagram](./docs/ARCHITECTURE_DIAGRAM.md).
 
 ## Implementation Notes
 

@@ -43,6 +43,10 @@ export function MessageItem({ message, onAddReaction }: MessageItemProps) {
   // Get sender user data for status display
   const senderUser = getUserById(message.senderId)
 
+  // Fallback data if user not found
+  const senderName = senderUser?.displayName || 'Unknown User'
+  const senderAvatar = senderUser?.avatarUrl || '/placeholder.svg'
+
   const handleEditClick = () => {
     setEditText(message.text || '')
     setMessageBeingEdited(message.id)
@@ -75,8 +79,8 @@ export function MessageItem({ message, onAddReaction }: MessageItemProps) {
       <div className="flex flex-1 gap-3">
         <div className="relative mt-1 flex-shrink-0">
           <Avatar>
-            <AvatarImage src={message.senderAvatar || '/mock-image.svg'} alt={message.senderName} />
-            <AvatarFallback>{message.senderName.charAt(0)}</AvatarFallback>
+            <AvatarImage src={senderAvatar || '/placeholder.svg'} alt={senderName} />
+            <AvatarFallback>{senderName.charAt(0)}</AvatarFallback>
           </Avatar>
           <StatusIndicator status={senderUser?.status} className="absolute right-0 top-0" />
         </div>
@@ -84,7 +88,7 @@ export function MessageItem({ message, onAddReaction }: MessageItemProps) {
         {/* Message Content */}
         <div className={cn('flex max-w-[75%] flex-col items-start', isEditing && 'flex-1')}>
           <div className="mb-1 flex items-center gap-2">
-            <span className="text-sm font-medium text-gray-800 dark:text-white">{message.senderName}</span>
+            <span className="text-sm font-medium text-gray-800 dark:text-white">{senderName}</span>
             <span className="text-xs text-muted-foreground">
               {new Date(message.timestamp).toLocaleTimeString([], {
                 hour: '2-digit',

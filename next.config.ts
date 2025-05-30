@@ -4,6 +4,7 @@ const nextConfig: NextConfig = {
   experimental: {
     ppr: true,
   },
+
   images: {
     domains: ['api.dicebear.com', 'images.unsplash.com'],
     remotePatterns: [

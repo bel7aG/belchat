@@ -21,8 +21,6 @@ export interface User {
 export interface Message {
   id: string
   senderId: string
-  senderName: string
-  senderAvatar: string
   type: 'text' | 'file' | 'mixed'
   text?: string
   fileData?: {
@@ -66,7 +64,7 @@ export interface Conversation {
 export const mockUsers: User[] = [
   {
     id: 'current-user',
-    username: 'bel',
+    username: 'you',
     displayName: 'You',
     avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=You',
     email: 'you@example.com',
@@ -127,7 +125,7 @@ export const mockUsers: User[] = [
 ]
 
 // Generate mock messages for a conversation
-function generateMockMessages(senderId: string, senderName: string, senderAvatar: string, count: number): Message[] {
+function generateMockMessages(senderId: string, count: number): Message[] {
   const messages: Message[] = []
   const now = new Date()
 
@@ -161,8 +159,6 @@ function generateMockMessages(senderId: string, senderName: string, senderAvatar
     const message: Message = {
       id: `msg-${senderId}-${i}`,
       senderId: isCurrentUser ? 'current-user' : senderId,
-      senderName: isCurrentUser ? 'You' : senderName,
-      senderAvatar: isCurrentUser ? 'https://api.dicebear.com/7.x/avataaars/svg?seed=You' : senderAvatar,
       type: messageType,
       timestamp: new Date(now.getTime() - (count - i) * 5 * 60000 - Math.random() * 300000),
       readBy: [isCurrentUser ? 'current-user' : senderId],
@@ -229,12 +225,7 @@ export const mockConversations: Conversation[] = [
     lastMessage: 'Did you see the latest design updates?',
     lastMessageTime: new Date(Date.now() - 15 * 60000),
     unreadCount: 2,
-    messages: generateMockMessages(
-      'user-1',
-      'Alice Johnson',
-      'https://api.dicebear.com/7.x/avataaars/svg?seed=Alice',
-      12,
-    ),
+    messages: generateMockMessages('user-1', 12),
     createdAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
     updatedAt: new Date(Date.now() - 15 * 60000),
   },
@@ -247,7 +238,7 @@ export const mockConversations: Conversation[] = [
     lastMessage: "I'll send you the report by EOD",
     lastMessageTime: new Date(Date.now() - 2 * 60 * 60000),
     unreadCount: 0,
-    messages: generateMockMessages('user-2', 'Bob Smith', 'https://api.dicebear.com/7.x/avataaars/svg?seed=Bob', 8),
+    messages: generateMockMessages('user-2', 8),
     createdAt: new Date(Date.now() - 25 * 24 * 60 * 60 * 1000),
     updatedAt: new Date(Date.now() - 2 * 60 * 60000),
   },
@@ -260,12 +251,7 @@ export const mockConversations: Conversation[] = [
     lastMessageSender: 'Alice',
     lastMessageTime: new Date(Date.now() - 5 * 60 * 60000),
     unreadCount: 5,
-    messages: generateMockMessages(
-      'user-1',
-      'Alice Johnson',
-      'https://api.dicebear.com/7.x/avataaars/svg?seed=Alice',
-      15,
-    ),
+    messages: generateMockMessages('user-1', 15),
     createdAt: new Date(Date.now() - 20 * 24 * 60 * 60 * 1000),
     updatedAt: new Date(Date.now() - 5 * 60 * 60000),
   },
@@ -278,12 +264,7 @@ export const mockConversations: Conversation[] = [
     lastMessage: 'Are we still meeting tomorrow?',
     lastMessageTime: new Date(Date.now() - 1 * 24 * 60 * 60000),
     unreadCount: 0,
-    messages: generateMockMessages(
-      'user-3',
-      'Charlie Davis',
-      'https://api.dicebear.com/7.x/avataaars/svg?seed=Charlie',
-      10,
-    ),
+    messages: generateMockMessages('user-3', 10),
     createdAt: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000),
     updatedAt: new Date(Date.now() - 1 * 24 * 60 * 60000),
   },
@@ -296,7 +277,7 @@ export const mockConversations: Conversation[] = [
     lastMessageSender: 'Bob',
     lastMessageTime: new Date(Date.now() - 2 * 24 * 60 * 60000),
     unreadCount: 0,
-    messages: generateMockMessages('user-2', 'Bob Smith', 'https://api.dicebear.com/7.x/avataaars/svg?seed=Bob', 20),
+    messages: generateMockMessages('user-2', 20),
     createdAt: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000),
     updatedAt: new Date(Date.now() - 2 * 24 * 60 * 60000),
   },
@@ -309,12 +290,7 @@ export const mockConversations: Conversation[] = [
     lastMessage: 'Thanks for your help with the presentation',
     lastMessageTime: new Date(Date.now() - 3 * 24 * 60 * 60000),
     unreadCount: 0,
-    messages: generateMockMessages(
-      'user-4',
-      'Diana Miller',
-      'https://api.dicebear.com/7.x/avataaars/svg?seed=Diana',
-      7,
-    ),
+    messages: generateMockMessages('user-4', 7),
     createdAt: new Date(Date.now() - 8 * 24 * 60 * 60 * 1000),
     updatedAt: new Date(Date.now() - 3 * 24 * 60 * 60000),
   },
@@ -327,12 +303,7 @@ export const mockConversations: Conversation[] = [
     lastMessageSender: 'Diana',
     lastMessageTime: new Date(Date.now() - 4 * 24 * 60 * 60000),
     unreadCount: 0,
-    messages: generateMockMessages(
-      'user-4',
-      'Diana Miller',
-      'https://api.dicebear.com/7.x/avataaars/svg?seed=Diana',
-      18,
-    ),
+    messages: generateMockMessages('user-4', 18),
     createdAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000),
     updatedAt: new Date(Date.now() - 4 * 24 * 60 * 60000),
   },
@@ -345,12 +316,7 @@ export const mockConversations: Conversation[] = [
     lastMessage: "I've pushed the code changes",
     lastMessageTime: new Date(Date.now() - 5 * 24 * 60 * 60000),
     unreadCount: 0,
-    messages: generateMockMessages(
-      'user-5',
-      'Ethan Wilson',
-      'https://api.dicebear.com/7.x/avataaars/svg?seed=Ethan',
-      9,
-    ),
+    messages: generateMockMessages('user-5', 9),
     createdAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000),
     updatedAt: new Date(Date.now() - 5 * 24 * 60 * 60000),
   },

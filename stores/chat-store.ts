@@ -1,6 +1,8 @@
 import { create } from 'zustand'
+
 import type { Message, Conversation } from '../lib/mock-data'
 import { mockConversations } from '../lib/mock-data'
+import { useUserStore } from './user-store'
 
 interface ChatStore {
   conversations: Conversation[]
@@ -30,6 +32,10 @@ export const useChatStore = create<ChatStore>((set) => ({
 
   sendMessage: (conversationId, message) =>
     set((state) => {
+      // Get user data for the sender
+      const senderUser = useUserStore.getState().getUserById(message.senderId)
+      const senderName = senderUser?.displayName || 'Unknown User'
+
       const updatedConversations = state.conversations.map((conv) => {
         if (conv.id === conversationId) {
           return {
@@ -37,7 +43,7 @@ export const useChatStore = create<ChatStore>((set) => ({
             messages: [...conv.messages, message],
             lastMessage: message.text || 'Sent a file',
             lastMessageTime: message.timestamp,
-            lastMessageSender: message.senderName,
+            lastMessageSender: senderName,
             updatedAt: new Date(),
           }
         }

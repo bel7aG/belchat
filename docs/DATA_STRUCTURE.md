@@ -135,8 +135,6 @@ Messages are stored as a subcollection under each conversation document.
 {
   id: string                    // Same as document ID
   senderId: string              // User ID of sender
-  senderName: string            // Display name
-  senderAvatar: string          // Avatar URL
   type: 'text' | 'file' | 'mixed'  // Message type
   text?: string                 // Text content (if applicable)
   fileData?: {                  // File data (if applicable)
@@ -203,8 +201,6 @@ Key metadata:
 {
   "id": "msg123",
   "senderId": "user123",
-  "senderName": "John Doe",
-  "senderAvatar": "https://storage.googleapis.com/belchat-app.appspot.com/users/user123/avatar.jpg",
   "type": "text",
   "text": "Hello everyone! How are you doing today?",
   "timestamp": {
@@ -233,8 +229,6 @@ Key metadata:
 {
   "id": "msg456",
   "senderId": "user456",
-  "senderName": "Jane Smith",
-  "senderAvatar": "https://storage.googleapis.com/belchat-app.appspot.com/users/user456/avatar.jpg",
   "type": "file",
   "fileData": {
     "url": "https://storage.googleapis.com/belchat-app.appspot.com/conversations/conv123/messages/msg456/image.jpg",
@@ -259,8 +253,6 @@ Key metadata:
 {
   "id": "msg789",
   "senderId": "user789",
-  "senderName": "Alex Johnson",
-  "senderAvatar": "https://storage.googleapis.com/belchat-app.appspot.com/users/user789/avatar.jpg",
   "type": "mixed",
   "text": "Here's the document we discussed yesterday",
   "fileData": {
