@@ -107,8 +107,6 @@ export default function ChatRoom({ conversation }: ChatRoomProps) {
       const newMessage: Message = {
         id: Date.now().toString(),
         senderId: currentUser.id,
-        senderName: currentUser.displayName,
-        senderAvatar: currentUser.avatarUrl,
         type: selectedFile && inputText ? 'mixed' : selectedFile ? 'file' : 'text',
         text: inputText || undefined,
         fileData: selectedFile
